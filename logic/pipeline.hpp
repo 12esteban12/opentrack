@@ -102,7 +102,7 @@ private:
 
     reltrans rel;
 
-    state real_rotation, scaled_rotation;
+    state real_rotation;
     euler_t t_center;
 
     ns backlog_time = ns(0);
@@ -113,9 +113,6 @@ private:
     void logic();
     void run() override;
 
-    // note: float exponent base is 2
-    static constexpr inline double c_mult = 16;
-    static constexpr inline double c_div = 1./c_mult;
 public:
     pipeline(Mappings& m, runtime_libraries& libs, event_handler& ev, TrackLogger& logger);
     ~pipeline();

@@ -285,7 +285,6 @@ void pipeline::logic()
 
     {
         euler_t tmp = d2r * euler_t(&value[Yaw]);
-        scaled_rotation.rotation = euler_to_rmat(c_div * tmp);
         real_rotation.rotation = euler_to_rmat(tmp);
     }
 
@@ -311,7 +310,6 @@ void pipeline::logic()
 
         if (own_center_logic)
         {
-            scaled_rotation.rot_center = rmat::eye();
             real_rotation.rot_center = rmat::eye();
 
             t_center = euler_t();
@@ -319,14 +317,13 @@ void pipeline::logic()
         else
         {
             real_rotation.rot_center = real_rotation.rotation.t();
-            scaled_rotation.rot_center = scaled_rotation.rotation.t();
 
             t_center = euler_t(&value(TX));
         }
     }
 
     {
-        rmat rotation = scaled_rotation.rotation;
+        rmat rotation = real_rotation.rotation;
         euler_t pos = euler_t(&value[TX]) - t_center;
 
         //switch (s.center_method)
@@ -334,18 +331,18 @@ void pipeline::logic()
         {
         case 0:
             // inertial
-            rotation = scaled_rotation.rot_center * rotation;
+            rotation = real_rotation.rot_center * rotation;
         break;
 
         default:
         case 1:
             // camera
-            rotation = rotation * scaled_rotation.rot_center;
+            rotation = rotation * real_rotation.rot_center;
             pos = rel.rotate(real_rotation.rot_center, pos, false, false, false);
         break;
         }
 
-        euler_t rot = r2d * c_mult * rmat_to_euler(rotation);
+        euler_t rot = r2d * rmat_to_euler(rotation);
 
         for (int i = 0; i < 3; i++)
         {
